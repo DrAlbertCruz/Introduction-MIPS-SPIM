@@ -42,7 +42,13 @@ Loaded: /usr/share/spim/exceptions.s
 (spim)
 ```
 
-or similar. Your must load each `.s` file one-by-one. Assuming you're in the cloned directory:
+or similar. To quit SPIM, execute `quit`, like so:
+
+```bash
+(spim) quit
+```
+
+Your must load each `.s` file one-by-one. Assuming you're in the cloned directory:
 
 ```bash
 (spim) load "printf.s"
