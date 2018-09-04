@@ -19,7 +19,15 @@ If you are using the department server, ignore this step. SPIM is already instal
 
 ## Objectives
 
-* Write a MIPS program that makes function calls
+* Write a MIPS program that prompts the user for two integers and displays the result. E.g.:
+```mips
+(spim) run
+Enter a number:
+5
+Enter another number:
+6
+The result is 11.
+```
 * Understand `la`, `li`, `lb`, `jal` and `syscall`
 
 ## Background
