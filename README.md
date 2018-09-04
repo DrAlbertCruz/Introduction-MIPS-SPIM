@@ -193,6 +193,12 @@ Adding them together is 2.
 ```
 *Hint: Make your changes in read.s.*
 
+## Pitfalls
+
+Though you were given a C-style `printf`, you should not make calls to `printf` from within `read.s`. The reason for that is you arrive at `read.s` through a `jal` call from `main.s`. The address to return back into `main.s` is stored in the register `$ra`. Note that at the end of the `read` function, you `jr $ra` to get back to `main`. However, calling another function (such as `printf`) from within `read.s` will cause `$ra` to become overwritten, thus stuck will be stuck in a loop. You should stick to using `syscall` for I/O. Consult the following for more information about it:
+
+* https://courses.missouristate.edu/KenVollmar/mars/Help/SyscallHelp.html
+
 # Discussion
 
 Insert responses to this in your lab report:
