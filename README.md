@@ -40,10 +40,15 @@ If this does not work and you're on your own machine, please see the above secti
 
 ```bash
 Loaded: /usr/share/spim/exceptions.s
+SPIM Version 9.1.4 of September 4, 2011
+Copyright 1990-2010, James R. Larus.
+All Rights Reserved.
+SPIM is distributed under a BSD license.
+See the file README for a full copyright notice.
 (spim)
 ```
 
-or similar. To quit SPIM, execute `quit`, like so:
+or similar. To quit the SPIM CLI, execute `quit`, like so:
 
 ```bash
 (spim) quit
@@ -88,7 +93,7 @@ Enter an integer [return]:
 
 ## Pitfalls
 
-`load "main.s"` appends the source code in the `main.s` file into SPIM's simluated memory. It does not keep track of what was previously inserted. It will not smartly recognize the block of code that was previously associated with `main.s` to check it for collisions. So, if you insert `main.s`, update it later, and attempt to `load "main.s"` again it will cause two `main`s to be in existence and cause an error. For example, attempt to load `main.s` twice:
+`load "main.s"` appends the source code in the `main.s` file into SPIM's simluated memory. It does not keep track of what was previously inserted. If you change `main.s` and then attempt to reload it into the CLI it will not smartly recognize the block of code that was previously associated with `main.s` to check it for collisions. So, if you insert `main.s`, update it later, and attempt to `load "main.s"` again it will cause two `main`s to be in existence and cause an error. For example, attempt to load `main.s` twice:
 
 ```bash
 (spim) load "main.s"
@@ -111,9 +116,11 @@ See the file README for a full copyright notice.
 (spim)
 ```
 
+Actually, if even if you accidentally loaded the same file twice, you will need to `reinitialize` to fix the error.
+
 ## Study `main.s`
 
-Close SPIM, open your favorite text editor and look at `main.s`. The few lines are comments:
+Close SPIM, open your favorite text editor and look at `main.s`. The top lines are comments:
 
 ```MIPS
 # filename: main.s
@@ -128,7 +135,7 @@ The following lines:
 .ent  main
 ```
 
-are a preamble that lets MIPS know that the following lines of code are instructions, declares a subroutine called `main`, and labels the entry point for `main` when debugging the code. The first bit of real MIPS code is here:
+are a preamble that lets MIPS know that the following lines of code are instructions, declares a subroutine called `main` *for linking purposes*, and labels the entry point for `main` when debugging the code. The first bit of real MIPS code is here:
 
 ```MIPS
 main:
@@ -138,7 +145,7 @@ main:
 
 `main:` labels the next instruction as `main`. From above, when `run` is executed, it looks for an instruction labelled `main`, and runs that. `la` loads an address in memory into a register. A register is a series of flip-flops on the microprocessor that stores data. A microprocessor has a limited number of these. With MIPS32, these registers are generally 32-bits in size, and can hold either data or memory addresses. `la  $a0,format1` takes the pointer `format1` and loads its value into the register `$a0`. 
 
-`jal printf` is a function call. Each line of instruction in your code is associated with an address. Your main function starts at 0 (this is simulated, note that we talked about different starting addresses in practice during lecture). The program will march through each line in your code, line by line. It runs line 0. Then it runs line 1, and so on until it hits the sequence of commands to quit. In a high-level language we would alter the control flow with if, switch, for, etc. With `jal` we explicitly tell it to skip to a specific address or block. For example, the above line of code jumps to the block of code labeled printf which you can find in the file printf.s (look at this file and note the line printf:). How are arguments passed? Note that we load values into the registers $a0, $a1, etc. before calling printf. For these lines of code, we pass it `format1`. It is defined on lines 51-52:
+`jal printf` is a function call. Each line of instruction in your code is associated with an address. Your main function starts at 0 (this is simulated). The program will march through each line in your code, line by line. It runs line 0. Then it runs line 1, and so on until it hits the sequence of commands to quit. In a high-level language we would alter the control flow with if, switch, for, etc. With `jal` we explicitly tell it to skip to a specific address or block. For example, the above line of code jumps to the block of code labeled printf which you can find in the file printf.s (look at this file and note the line printf:). How are arguments passed? Note that we load values into the registers $a0, $a1, etc. before calling printf. For these lines of code, we pass it `format1`. It is defined on lines 51-52:
 
 ```MIPS
 ...
@@ -147,7 +154,7 @@ format1:
   .asciiz "Hello world.\n"        # asciiz adds trailing null byte to string
 ```
 
-Note that this section starts with `.data` indicating that what follows should be read into memory, rather than treated as instructions. `format1:`, much like the `main:` labels the next instruction. Thus, when `la  $a0,format1` is carried out, `$a0` is loaded with the memory location of wherever in memory `format1` is located. Note that strings in C-language are an arracy of `char`s with a null terminator, denoted in MIPS as the type `.asciiz`. This is roughly equivalent to the following C code:
+Note that this section starts with `.data` indicating that what follows should be read into memory, rather than treated as instructions. `format1:`, much like the `main:` labels the next instruction. Thus, when `la  $a0,format1` is carried out, `$a0` is loaded with the memory location of wherever in memory `format1` is located. Note that strings in C-language are an array of `char`s with a null terminator, denoted in MIPS as the type `.asciiz`. This is roughly equivalent to the following C code:
 
 ```c
 printf( "Hello world\n!" );
@@ -170,18 +177,21 @@ This is similar to the C code:
 printf( "Register $a1 holds: %d\n", 10 );
 ```
 
-Take your time studying the operation of `main.s` and the `printf` function. Pay particular attention to the format specifiers `%d` and `%s`.
+Take your time studying the operation of `main.s` and the `printf` function. Pay particular attention to the format specifiers `%d`.
 
-For this part of the lab, you should get the program to ask the user what their name is, and what their favorite number is, and display echo this to the terminal with a single `printf` call. For example:
+## Lab check off
+
+For full credit, you should get the program to ask for two integers add them together and display the result. For example:
 
 ```bash
-Enter your name [return]:
-picard
-Enter an integer [return]:
-1701
-Your name is picard and your favorite number is 1701.
+Enter the first number [return]:
+1
+Enter the second number [return]:
+1
+Adding them together is 2.
 (spim)
 ```
+*Hint: Make your changes in read.s.*
 
 # Discussion
 
